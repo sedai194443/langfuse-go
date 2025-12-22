@@ -152,4 +152,3 @@ func TestClient_Score_WithObservationID(t *testing.T) {
 		t.Fatalf("Score() error = %v", err)
 	}
 }
-

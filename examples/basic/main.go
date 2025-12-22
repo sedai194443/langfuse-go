@@ -86,7 +86,7 @@ func main() {
 		Name:      "database-query",
 		StartTime: &spanStart,
 		Input: map[string]interface{}{
-			"query": "SELECT * FROM users WHERE id = ?",
+			"query":  "SELECT * FROM users WHERE id = ?",
 			"params": []interface{}{123},
 		},
 	})
@@ -126,4 +126,3 @@ func main() {
 
 	fmt.Println("\nExample completed successfully!")
 }
-

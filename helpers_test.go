@@ -79,4 +79,3 @@ func TestGenerateID(t *testing.T) {
 		t.Error("generateID() should generate non-empty ID")
 	}
 }
-

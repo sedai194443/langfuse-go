@@ -158,4 +158,3 @@ func TestClient_CreateGeneration_Error(t *testing.T) {
 		t.Errorf("CreateGeneration() status code = %v, want %v", apiErr.StatusCode, http.StatusUnauthorized)
 	}
 }
-

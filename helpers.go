@@ -55,4 +55,3 @@ func NewScore(traceID, name string, value float64) Score {
 func generateID() string {
 	return uuid.New().String()
 }
-

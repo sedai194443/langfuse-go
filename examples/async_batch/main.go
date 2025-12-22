@@ -20,12 +20,12 @@ func main() {
 			SecretKey: "sk-lf-your-secret-key",
 		},
 		langfuse.BatchConfig{
-			MaxBatchSize:  50,                      // Flush when 50 events are queued
-			FlushInterval: 2 * time.Second,         // Or flush every 2 seconds
-			MaxRetries:    3,                       // Retry failed requests up to 3 times
-			RetryDelay:    500 * time.Millisecond,  // Initial retry delay (exponential backoff)
-			QueueSize:     10000,                   // Max events in queue
-			ShutdownTimeout: 30 * time.Second,      // Max wait time for shutdown
+			MaxBatchSize:    50,                     // Flush when 50 events are queued
+			FlushInterval:   2 * time.Second,        // Or flush every 2 seconds
+			MaxRetries:      3,                      // Retry failed requests up to 3 times
+			RetryDelay:      500 * time.Millisecond, // Initial retry delay (exponential backoff)
+			QueueSize:       10000,                  // Max events in queue
+			ShutdownTimeout: 30 * time.Second,       // Max wait time for shutdown
 			OnError: func(err error, events []langfuse.BatchEvent) {
 				// Handle failed batches (e.g., log to error monitoring)
 				log.Printf("Failed to send %d events: %v", len(events), err)
@@ -47,7 +47,7 @@ func main() {
 
 	// Example 1: Basic async trace creation
 	fmt.Println("=== Example 1: Basic Async Operations ===")
-	
+
 	// CreateTraceAsync returns immediately - the event is queued
 	traceID, err := client.CreateTraceAsync(langfuse.Trace{
 		Name:      "async-example-trace",
@@ -151,7 +151,7 @@ func main() {
 
 	// Example 2: High-volume concurrent writes
 	fmt.Println("\n=== Example 2: High-Volume Concurrent Writes ===")
-	
+
 	var wg sync.WaitGroup
 	numTraces := 100
 
@@ -160,21 +160,21 @@ func main() {
 		wg.Add(1)
 		go func(i int) {
 			defer wg.Done()
-			
+
 			// Create trace
 			tid, _ := client.CreateTraceAsync(langfuse.Trace{
 				Name:   fmt.Sprintf("concurrent-trace-%d", i),
 				UserID: fmt.Sprintf("user-%d", i%10),
 				Input:  map[string]interface{}{"index": i},
 			})
-			
+
 			// Create span
 			sid, _ := client.CreateSpanAsync(langfuse.Span{
 				TraceID: tid,
 				Name:    "concurrent-span",
 				Input:   map[string]interface{}{"index": i},
 			})
-			
+
 			// Update span
 			_ = client.UpdateSpanAsync(sid, langfuse.SpanUpdate{
 				Output: map[string]interface{}{"completed": true},
@@ -182,14 +182,14 @@ func main() {
 		}(i)
 	}
 	wg.Wait()
-	
+
 	elapsed := time.Since(start)
 	fmt.Printf("Queued %d traces with spans in %v\n", numTraces, elapsed)
 	fmt.Printf("Queue length after concurrent writes: %d\n", client.QueueLength())
 
 	// Example 3: Manual flush
 	fmt.Println("\n=== Example 3: Manual Flush ===")
-	
+
 	// Sometimes you want to ensure events are sent immediately
 	// (e.g., before sending a response to the user)
 	fmt.Println("Flushing queue...")
@@ -200,9 +200,9 @@ func main() {
 
 	// Example 4: Using batch processor directly (advanced)
 	fmt.Println("\n=== Example 4: Direct BatchProcessor Access ===")
-	
+
 	bp := client.BatchProcessor()
-	
+
 	// You can enqueue raw batch events
 	err = bp.Enqueue(langfuse.BatchEvent{
 		Type: langfuse.BatchEventTypeTrace,
@@ -218,7 +218,7 @@ func main() {
 
 	// Example 5: Sync fallback (when you need the response)
 	fmt.Println("\n=== Example 5: Sync Fallback ===")
-	
+
 	// AsyncClient embeds Client, so you can still use sync methods
 	// when you need the actual response
 	syncTrace, err := client.CreateTrace(context.TODO(), langfuse.Trace{
@@ -233,4 +233,3 @@ func main() {
 
 	fmt.Println("\nAsync batch example completed!")
 }
-
