@@ -11,11 +11,22 @@ import (
 // TraceContextKey is the context key for storing trace context
 type TraceContextKey struct{}
 
+// PropagatedAttributesKey is the context key for storing propagated attributes
+type PropagatedAttributesKey struct{}
+
 // TraceContext holds trace and observation IDs for context propagation
 type TraceContext struct {
 	TraceID      string
 	SpanID       string // Current observation ID
 	ParentSpanID string
+}
+
+// PropagatedAttributes holds attributes that propagate to all child spans
+type PropagatedAttributes struct {
+	SessionID string
+	UserID    string
+	Tags      []string
+	Metadata  map[string]interface{}
 }
 
 // createTraceID generates a W3C-compliant trace ID (32-char hex, 16 bytes)
@@ -103,3 +114,59 @@ func GetCurrentObservationID(ctx context.Context) (string, bool) {
 	return traceCtx.SpanID, traceCtx.SpanID != ""
 }
 
+// WithPropagatedAttributes adds propagated attributes to context
+// These attributes will be automatically applied to all child spans/generations
+func WithPropagatedAttributes(ctx context.Context, attrs PropagatedAttributes) context.Context {
+	return context.WithValue(ctx, PropagatedAttributesKey{}, attrs)
+}
+
+// GetPropagatedAttributes retrieves propagated attributes from context
+func GetPropagatedAttributes(ctx context.Context) (PropagatedAttributes, bool) {
+	attrs, ok := ctx.Value(PropagatedAttributesKey{}).(PropagatedAttributes)
+	return attrs, ok
+}
+
+// MergePropagatedAttributes merges existing propagated attributes with new ones
+// New values override existing ones, tags and metadata are merged
+func MergePropagatedAttributes(ctx context.Context, newAttrs PropagatedAttributes) context.Context {
+	existing, ok := GetPropagatedAttributes(ctx)
+	if !ok {
+		return WithPropagatedAttributes(ctx, newAttrs)
+	}
+
+	merged := PropagatedAttributes{
+		SessionID: newAttrs.SessionID,
+		UserID:    newAttrs.UserID,
+	}
+
+	// Use existing if new is empty
+	if merged.SessionID == "" {
+		merged.SessionID = existing.SessionID
+	}
+	if merged.UserID == "" {
+		merged.UserID = existing.UserID
+	}
+
+	// Merge tags
+	tagSet := make(map[string]bool)
+	for _, t := range existing.Tags {
+		tagSet[t] = true
+	}
+	for _, t := range newAttrs.Tags {
+		tagSet[t] = true
+	}
+	for t := range tagSet {
+		merged.Tags = append(merged.Tags, t)
+	}
+
+	// Merge metadata
+	merged.Metadata = make(map[string]interface{})
+	for k, v := range existing.Metadata {
+		merged.Metadata[k] = v
+	}
+	for k, v := range newAttrs.Metadata {
+		merged.Metadata[k] = v
+	}
+
+	return WithPropagatedAttributes(ctx, merged)
+}

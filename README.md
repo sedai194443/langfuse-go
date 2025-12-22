@@ -218,6 +218,20 @@ See the `examples/logger/` directory for examples of using the logger interface 
 
 See the `examples/context_propagation/` directory for examples of propagating trace context across services.
 
+### Async/Batch Processing Examples
+
+See the `examples/async_batch/` directory for examples of high-performance async batch processing:
+- Background batch processing with configurable settings
+- High-volume concurrent writes
+- Manual flush and graceful shutdown
+
+### Specialized Observation Types Examples
+
+See the `examples/observation_types/` directory for examples of specialized observation types:
+- Agent, Tool, Chain, Retriever
+- Embedding, Evaluator, Guardrail
+- Context management with `StartAsCurrent*` methods
+
 ## Advanced Features
 
 ### W3C Trace Context
@@ -277,6 +291,85 @@ ctx := langfuse.WithTraceContext(ctx, traceCtx)
 
 // New observations will join the existing trace
 span, err := client.StartObservation(ctx, langfuse.ObservationTypeSpan, "downstream-task", input)
+```
+
+### Async/Batch Processing
+
+Use `AsyncClient` for high-performance production workloads:
+
+```go
+// Create async client with batch processing
+client, err := langfuse.NewAsyncClient(
+    langfuse.Config{
+        PublicKey: "pk-xxx",
+        SecretKey: "sk-xxx",
+    },
+    langfuse.BatchConfig{
+        MaxBatchSize:  100,              // Flush when 100 events queued
+        FlushInterval: 5 * time.Second,  // Or flush every 5 seconds
+        MaxRetries:    3,                // Retry failed requests
+        OnError: func(err error, events []langfuse.BatchEvent) {
+            log.Printf("Failed to send %d events: %v", len(events), err)
+        },
+    },
+)
+if err != nil {
+    log.Fatal(err)
+}
+defer client.Shutdown() // Always shutdown to flush pending events
+
+// Async operations return immediately
+traceID, _ := client.CreateTraceAsync(langfuse.Trace{Name: "my-trace"})
+spanID, _ := client.CreateSpanAsync(langfuse.Span{TraceID: traceID, Name: "my-span"})
+
+// Force flush when needed (e.g., before response)
+client.Flush()
+```
+
+### Specialized Observation Types
+
+Use specialized observation types for better categorization:
+
+```go
+// Agent - reasoning blocks using LLM guidance
+agent, _ := client.StartAgent(ctx, "my-agent", input)
+defer agent.End()
+
+// Tool - external tool calls (e.g., APIs)
+tool, _ := client.StartTool(ctx, "api-call", input)
+tool.Update(langfuse.SpanUpdate{Output: response})
+tool.End()
+
+// Chain - connecting LLM application steps
+chain, _ := client.StartChain(ctx, "rag-chain", input)
+
+// Retriever - data retrieval (e.g., vector stores)
+retriever, _ := client.StartRetriever(ctx, "vector-search", query)
+
+// Embedding - LLM embedding calls
+embedding, _ := client.StartEmbedding(ctx, "embed", "text-embedding-3-small", text)
+
+// Evaluator - assessing LLM outputs
+evaluator, _ := client.StartEvaluator(ctx, "quality-check", response)
+
+// Guardrail - protection against jailbreaks
+guardrail, _ := client.StartGuardrail(ctx, "safety-filter", content)
+```
+
+Context-aware variants store the observation in context:
+
+```go
+// Returns new context with observation stored
+ctx, agent, _ := client.StartAsCurrentAgent(ctx, "my-agent", input)
+defer agent.End()
+
+// Get current observation from context
+if obs, ok := langfuse.GetCurrentObservation(ctx); ok {
+    fmt.Printf("Current: %s\n", obs.ID)
+}
+
+// Update current span via context
+client.UpdateCurrentSpan(ctx, output, metadata)
 ```
 
 ## Testing

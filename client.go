@@ -13,7 +13,7 @@ import (
 
 const (
 	// SDKVersion is the version of this SDK
-	SDKVersion = "0.1.0"
+	SDKVersion = "0.1.4"
 	// DefaultBaseURL is the default Langfuse API base URL
 	DefaultBaseURL = "https://cloud.langfuse.com"
 	// DefaultTimeout is the default HTTP client timeout
@@ -174,6 +174,10 @@ func (c *Client) handleResponse(resp *http.Response, v interface{}, allowCreated
 
 // CreateTrace creates a new trace
 func (c *Client) CreateTrace(ctx context.Context, trace Trace) (*TraceResponse, error) {
+	// Auto-generate ID if not provided
+	if trace.ID == "" {
+		trace.ID = generateID()
+	}
 	resp, err := c.doRequest(ctx, "POST", "/traces", trace)
 	if err != nil {
 		return nil, err
@@ -184,11 +188,20 @@ func (c *Client) CreateTrace(ctx context.Context, trace Trace) (*TraceResponse, 
 		return nil, err
 	}
 
+	// Return the ID we generated/used
+	if traceResp.ID == "" {
+		traceResp.ID = trace.ID
+	}
+
 	return &traceResp, nil
 }
 
 // CreateSpan creates a new span
 func (c *Client) CreateSpan(ctx context.Context, span Span) (*SpanResponse, error) {
+	// Auto-generate ID if not provided
+	if span.ID == "" {
+		span.ID = generateID()
+	}
 	resp, err := c.doRequest(ctx, "POST", "/spans", span)
 	if err != nil {
 		return nil, err
@@ -199,11 +212,20 @@ func (c *Client) CreateSpan(ctx context.Context, span Span) (*SpanResponse, erro
 		return nil, err
 	}
 
+	// Return the ID we generated/used
+	if spanResp.ID == "" {
+		spanResp.ID = span.ID
+	}
+
 	return &spanResp, nil
 }
 
 // CreateGeneration creates a new generation
 func (c *Client) CreateGeneration(ctx context.Context, generation Generation) (*GenerationResponse, error) {
+	// Auto-generate ID if not provided
+	if generation.ID == "" {
+		generation.ID = generateID()
+	}
 	resp, err := c.doRequest(ctx, "POST", "/generations", generation)
 	if err != nil {
 		return nil, err
@@ -214,11 +236,20 @@ func (c *Client) CreateGeneration(ctx context.Context, generation Generation) (*
 		return nil, err
 	}
 
+	// Return the ID we generated/used
+	if genResp.ID == "" {
+		genResp.ID = generation.ID
+	}
+
 	return &genResp, nil
 }
 
 // CreateEvent creates a new event
 func (c *Client) CreateEvent(ctx context.Context, event Event) (*EventResponse, error) {
+	// Auto-generate ID if not provided
+	if event.ID == "" {
+		event.ID = generateID()
+	}
 	resp, err := c.doRequest(ctx, "POST", "/events", event)
 	if err != nil {
 		return nil, err
@@ -229,6 +260,11 @@ func (c *Client) CreateEvent(ctx context.Context, event Event) (*EventResponse, 
 		return nil, err
 	}
 
+	// Return the ID we generated/used
+	if eventResp.ID == "" {
+		eventResp.ID = event.ID
+	}
+
 	return &eventResp, nil
 }
 
@@ -236,6 +272,10 @@ func (c *Client) CreateEvent(ctx context.Context, event Event) (*EventResponse, 
 func (c *Client) Score(ctx context.Context, score Score) (*ScoreResponse, error) {
 	if score.Name == "" {
 		return nil, fmt.Errorf("score name is required")
+	}
+	// Auto-generate ID if not provided
+	if score.ID == "" {
+		score.ID = generateID()
 	}
 	resp, err := c.doRequest(ctx, "POST", "/scores", score)
 	if err != nil {
@@ -245,6 +285,11 @@ func (c *Client) Score(ctx context.Context, score Score) (*ScoreResponse, error)
 	var scoreResp ScoreResponse
 	if err := c.handleResponse(resp, &scoreResp, true); err != nil {
 		return nil, err
+	}
+
+	// Return the ID we generated/used
+	if scoreResp.ID == "" {
+		scoreResp.ID = score.ID
 	}
 
 	return &scoreResp, nil
@@ -266,33 +311,91 @@ func (c *Client) UpdateTrace(ctx context.Context, traceID string, trace TraceUpd
 	return &traceResp, nil
 }
 
-// UpdateSpan updates an existing span
+// UpdateSpan updates an existing span by posting with the same ID (upsert)
 func (c *Client) UpdateSpan(ctx context.Context, spanID string, span SpanUpdate) (*SpanResponse, error) {
-	endpoint := fmt.Sprintf("/spans/%s", spanID)
-	resp, err := c.doRequest(ctx, "PATCH", endpoint, span)
+	// Create a span with the ID and update fields
+	updateSpan := struct {
+		ID            string                 `json:"id"`
+		Name          *string                `json:"name,omitempty"`
+		EndTime       *time.Time             `json:"endTime,omitempty"`
+		Metadata      map[string]interface{} `json:"metadata,omitempty"`
+		Input         interface{}            `json:"input,omitempty"`
+		Output        interface{}            `json:"output,omitempty"`
+		Level         *Level                 `json:"level,omitempty"`
+		StatusMessage *string                `json:"statusMessage,omitempty"`
+	}{
+		ID:            spanID,
+		Name:          span.Name,
+		EndTime:       span.EndTime,
+		Metadata:      span.Metadata,
+		Input:         span.Input,
+		Output:        span.Output,
+		Level:         span.Level,
+		StatusMessage: span.StatusMessage,
+	}
+
+	resp, err := c.doRequest(ctx, "POST", "/spans", updateSpan)
 	if err != nil {
 		return nil, err
 	}
 
 	var spanResp SpanResponse
-	if err := c.handleResponse(resp, &spanResp, false); err != nil {
+	if err := c.handleResponse(resp, &spanResp, true); err != nil {
 		return nil, err
+	}
+
+	if spanResp.ID == "" {
+		spanResp.ID = spanID
 	}
 
 	return &spanResp, nil
 }
 
-// UpdateGeneration updates an existing generation
+// UpdateGeneration updates an existing generation by posting with the same ID (upsert)
 func (c *Client) UpdateGeneration(ctx context.Context, generationID string, generation GenerationUpdate) (*GenerationResponse, error) {
-	endpoint := fmt.Sprintf("/generations/%s", generationID)
-	resp, err := c.doRequest(ctx, "PATCH", endpoint, generation)
+	// Create a generation with the ID and update fields
+	updateGen := struct {
+		ID              string                 `json:"id"`
+		Name            *string                `json:"name,omitempty"`
+		EndTime         *time.Time             `json:"endTime,omitempty"`
+		Model           *string                `json:"model,omitempty"`
+		ModelParameters map[string]interface{} `json:"modelParameters,omitempty"`
+		Input           interface{}            `json:"input,omitempty"`
+		Output          interface{}            `json:"output,omitempty"`
+		Metadata        map[string]interface{} `json:"metadata,omitempty"`
+		Level           *Level                 `json:"level,omitempty"`
+		StatusMessage   *string                `json:"statusMessage,omitempty"`
+		Usage           *Usage                 `json:"usage,omitempty"`
+		Prompt          *Prompt                `json:"prompt,omitempty"`
+		Completion      *Completion            `json:"completion,omitempty"`
+	}{
+		ID:              generationID,
+		Name:            generation.Name,
+		EndTime:         generation.EndTime,
+		Model:           generation.Model,
+		ModelParameters: generation.ModelParameters,
+		Input:           generation.Input,
+		Output:          generation.Output,
+		Metadata:        generation.Metadata,
+		Level:           generation.Level,
+		StatusMessage:   generation.StatusMessage,
+		Usage:           generation.Usage,
+		Prompt:          generation.Prompt,
+		Completion:      generation.Completion,
+	}
+
+	resp, err := c.doRequest(ctx, "POST", "/generations", updateGen)
 	if err != nil {
 		return nil, err
 	}
 
 	var genResp GenerationResponse
-	if err := c.handleResponse(resp, &genResp, false); err != nil {
+	if err := c.handleResponse(resp, &genResp, true); err != nil {
 		return nil, err
+	}
+
+	if genResp.ID == "" {
+		genResp.ID = generationID
 	}
 
 	return &genResp, nil
