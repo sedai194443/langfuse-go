@@ -35,7 +35,7 @@ func TestClient_CreateGeneration(t *testing.T) {
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(GenerationResponse{ID: "gen-123"})
+		_ = json.NewEncoder(w).Encode(GenerationResponse{ID: "gen-123"})
 	}))
 	defer server.Close()
 
@@ -100,7 +100,7 @@ func TestClient_UpdateGeneration(t *testing.T) {
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(GenerationResponse{ID: "gen-123"})
+		_ = json.NewEncoder(w).Encode(GenerationResponse{ID: "gen-123"})
 	}))
 	defer server.Close()
 

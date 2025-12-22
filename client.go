@@ -144,7 +144,7 @@ func (c *Client) doRequest(ctx context.Context, method, endpoint string, body in
 
 // handleResponse handles HTTP response decoding and error checking
 func (c *Client) handleResponse(resp *http.Response, v interface{}, allowCreated bool) error {
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if allowCreated {
 		if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {

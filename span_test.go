@@ -32,7 +32,7 @@ func TestClient_CreateSpan(t *testing.T) {
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(SpanResponse{ID: "span-123"})
+		_ = json.NewEncoder(w).Encode(SpanResponse{ID: "span-123"})
 	}))
 	defer server.Close()
 
@@ -88,7 +88,7 @@ func TestClient_UpdateSpan(t *testing.T) {
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(SpanResponse{ID: "span-123"})
+		_ = json.NewEncoder(w).Encode(SpanResponse{ID: "span-123"})
 	}))
 	defer server.Close()
 
@@ -140,4 +140,3 @@ func TestClient_CreateSpan_Error(t *testing.T) {
 		t.Error("CreateSpan() expected APIError")
 	}
 }
-

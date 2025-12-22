@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"sync"
@@ -175,7 +176,7 @@ func main() {
 			})
 			
 			// Update span
-			client.UpdateSpanAsync(sid, langfuse.SpanUpdate{
+			_ = client.UpdateSpanAsync(sid, langfuse.SpanUpdate{
 				Output: map[string]interface{}{"completed": true},
 			})
 		}(i)
@@ -220,7 +221,7 @@ func main() {
 	
 	// AsyncClient embeds Client, so you can still use sync methods
 	// when you need the actual response
-	syncTrace, err := client.CreateTrace(nil, langfuse.Trace{
+	syncTrace, err := client.CreateTrace(context.TODO(), langfuse.Trace{
 		Name:  "sync-trace",
 		Input: map[string]interface{}{"mode": "synchronous"},
 	})

@@ -95,8 +95,15 @@ func TestBatchProcessor_Enqueue(t *testing.T) {
 	bp := NewBatchProcessor(client, BatchConfig{
 		QueueSize: 10,
 	})
-	bp.Start()
-	defer func() { _ = bp.Stop() }()
+	// Note: We intentionally do NOT start the processor here.
+	// This allows us to test that events are properly enqueued to the channel.
+	// If we called bp.Start(), the background goroutine would immediately
+	// consume events from the channel into its local batch, making QueueLength() return 0.
+
+	// We need to manually set running=true to allow enqueueing without starting the goroutine
+	bp.mu.Lock()
+	bp.running = true
+	bp.mu.Unlock()
 
 	// Enqueue various event types
 	tests := []struct {
@@ -123,6 +130,11 @@ func TestBatchProcessor_Enqueue(t *testing.T) {
 
 	if bp.QueueLength() == 0 {
 		t.Error("QueueLength() = 0, want > 0")
+	}
+
+	// Verify exact count
+	if bp.QueueLength() != 7 {
+		t.Errorf("QueueLength() = %d, want 7", bp.QueueLength())
 	}
 }
 

@@ -9,8 +9,8 @@ import (
 
 // ObserveOptions configures the observe wrapper behavior
 type ObserveOptions struct {
-	Name        string
-	AsType      ObservationType
+	Name          string
+	AsType        ObservationType
 	CaptureInput  bool
 	CaptureOutput bool
 }
@@ -24,43 +24,43 @@ func (c *Client) Observe(ctx context.Context, fn interface{}, opts *ObserveOptio
 			CaptureOutput: true,
 		}
 	}
-	
+
 	if opts.AsType == "" {
 		opts.AsType = ObservationTypeSpan
 	}
-	
+
 	if opts.Name == "" {
 		opts.Name = getFunctionName(fn)
 	}
-	
+
 	// Get function value and type
 	fnValue := reflect.ValueOf(fn)
 	fnType := fnValue.Type()
-	
+
 	if fnType.Kind() != reflect.Func {
 		return nil, fmt.Errorf("observe: expected function, got %T", fn)
 	}
-	
+
 	// Start observation
 	var input interface{}
 	if opts.CaptureInput {
 		input = captureInput(fnType, fnValue)
 	}
-	
+
 	obs, err := c.StartObservation(ctx, opts.AsType, opts.Name, input)
 	if err != nil {
 		return nil, fmt.Errorf("observe: failed to start observation: %w", err)
 	}
-	
+
 	// Execute function
 	startTime := time.Now()
 	var result interface{}
 	var fnErr error
-	
+
 	// Handle different function signatures
 	numIn := fnType.NumIn()
 	numOut := fnType.NumOut()
-	
+
 	// Prepare arguments (skip context if first param)
 	args := make([]reflect.Value, 0, numIn)
 	for i := 0; i < numIn; i++ {
@@ -72,10 +72,10 @@ func (c *Client) Observe(ctx context.Context, fn interface{}, opts *ObserveOptio
 			args = append(args, reflect.Zero(paramType))
 		}
 	}
-	
+
 	// Call function
 	results := fnValue.Call(args)
-	
+
 	// Extract results
 	if numOut > 0 {
 		result = results[0].Interface()
@@ -85,24 +85,24 @@ func (c *Client) Observe(ctx context.Context, fn interface{}, opts *ObserveOptio
 			fnErr = errVal.Interface().(error)
 		}
 	}
-	
+
 	// Update observation with output and end time
 	endTime := time.Now()
 	update := map[string]interface{}{
 		"duration_ms": time.Since(startTime).Milliseconds(),
 	}
-	
+
 	if opts.CaptureOutput && result != nil {
 		update["output"] = result
 	}
-	
+
 	if fnErr != nil {
 		update["error"] = fnErr.Error()
 		update["status"] = "error"
 	} else {
 		update["status"] = "success"
 	}
-	
+
 	// Update based on observation type
 	switch opts.AsType {
 	case ObservationTypeSpan:
@@ -114,7 +114,7 @@ func (c *Client) Observe(ctx context.Context, fn interface{}, opts *ObserveOptio
 			errMsg := fnErr.Error()
 			spanUpdate.StatusMessage = &errMsg
 		}
-		obs.Update(spanUpdate)
+		_ = obs.Update(spanUpdate)
 	case ObservationTypeGeneration:
 		genUpdate := GenerationUpdate{
 			EndTime: &endTime,
@@ -124,9 +124,9 @@ func (c *Client) Observe(ctx context.Context, fn interface{}, opts *ObserveOptio
 			errMsg := fnErr.Error()
 			genUpdate.StatusMessage = &errMsg
 		}
-		obs.Update(genUpdate)
+		_ = obs.Update(genUpdate)
 	}
-	
+
 	return result, fnErr
 }
 
@@ -148,4 +148,3 @@ func captureInput(fnType reflect.Type, fnValue reflect.Value) interface{} {
 		"function": getFunctionName(fnValue.Interface()),
 	}
 }
-

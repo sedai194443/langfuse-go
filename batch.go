@@ -462,7 +462,7 @@ func (bp *BatchProcessor) sendBatch(events []BatchEvent) error {
 		}
 		return fmt.Errorf("failed to execute request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	// Log response if logger is set
 	if bp.client.logger != nil {

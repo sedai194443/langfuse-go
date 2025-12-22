@@ -32,7 +32,7 @@ func TestClient_CreateEvent(t *testing.T) {
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(EventResponse{ID: "event-123"})
+		_ = json.NewEncoder(w).Encode(EventResponse{ID: "event-123"})
 	}))
 	defer server.Close()
 
@@ -89,7 +89,7 @@ func TestClient_Score(t *testing.T) {
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(ScoreResponse{ID: "score-123"})
+		_ = json.NewEncoder(w).Encode(ScoreResponse{ID: "score-123"})
 	}))
 	defer server.Close()
 
@@ -129,7 +129,7 @@ func TestClient_Score_WithObservationID(t *testing.T) {
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(ScoreResponse{ID: "score-123"})
+		_ = json.NewEncoder(w).Encode(ScoreResponse{ID: "score-123"})
 	}))
 	defer server.Close()
 

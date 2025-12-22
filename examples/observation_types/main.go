@@ -68,14 +68,14 @@ func main() {
 
 	// Simulate API call
 	time.Sleep(20 * time.Millisecond)
-	tool.Update(langfuse.SpanUpdate{
+	_ = tool.Update(langfuse.SpanUpdate{
 		Output: map[string]interface{}{
 			"latitude":  40.7128,
 			"longitude": -74.0060,
 			"city":      "New York",
 		},
 	})
-	tool.End()
+	_ = tool.End()
 	fmt.Println("Tool completed")
 
 	// Example 3: Retriever - Data retrieval (e.g., vector stores, databases)
@@ -92,7 +92,7 @@ func main() {
 
 	// Simulate vector search
 	time.Sleep(30 * time.Millisecond)
-	retriever.Update(langfuse.SpanUpdate{
+	_ = retriever.Update(langfuse.SpanUpdate{
 		Output: map[string]interface{}{
 			"results": []map[string]interface{}{
 				{"name": "Carbone", "rating": 4.8, "distance": "0.5 miles"},
@@ -102,7 +102,7 @@ func main() {
 			"total_results": 3,
 		},
 	})
-	retriever.End()
+	_ = retriever.End()
 	fmt.Println("Retriever completed")
 
 	// Example 4: Chain - Connecting LLM application steps
@@ -133,7 +133,7 @@ func main() {
 	// Simulate LLM call
 	time.Sleep(50 * time.Millisecond)
 	model := "gpt-4"
-	gen.Update(langfuse.GenerationUpdate{
+	_ = gen.Update(langfuse.GenerationUpdate{
 		Model: &model,
 		Output: map[string]interface{}{
 			"response": "I recommend Carbone! It has the highest rating (4.8) and is the closest at just 0.5 miles away.",
@@ -145,23 +145,23 @@ func main() {
 			Unit:   "TOKENS",
 		},
 	})
-	gen.End()
+	_ = gen.End()
 	fmt.Println("Generation completed")
 
 	// Complete chain
-	chain.Update(langfuse.SpanUpdate{
+	_ = chain.Update(langfuse.SpanUpdate{
 		Output: map[string]interface{}{
 			"recommendation": "Carbone",
 		},
 	})
-	chain.End()
+	_ = chain.End()
 	fmt.Println("Chain completed")
 
 	// Example 6: Evaluator - Assessing LLM outputs
 	fmt.Println("\n=== Example 6: Evaluator Observation ===")
 	evaluator, err := client.StartEvaluator(agentCtx, "response-quality-check", map[string]interface{}{
-		"response":  "I recommend Carbone!",
-		"criteria":  []string{"relevance", "helpfulness", "accuracy"},
+		"response": "I recommend Carbone!",
+		"criteria": []string{"relevance", "helpfulness", "accuracy"},
 	})
 	if err != nil {
 		log.Fatal(err)
@@ -170,7 +170,7 @@ func main() {
 
 	// Simulate evaluation
 	time.Sleep(20 * time.Millisecond)
-	evaluator.Update(langfuse.SpanUpdate{
+	_ = evaluator.Update(langfuse.SpanUpdate{
 		Output: map[string]interface{}{
 			"scores": map[string]float64{
 				"relevance":   0.95,
@@ -181,7 +181,7 @@ func main() {
 			"passed":        true,
 		},
 	})
-	evaluator.End()
+	_ = evaluator.End()
 	fmt.Println("Evaluator completed")
 
 	// Example 7: Guardrail - Protection against jailbreaks, offensive content
@@ -197,7 +197,7 @@ func main() {
 
 	// Simulate safety check
 	time.Sleep(10 * time.Millisecond)
-	guardrail.Update(langfuse.SpanUpdate{
+	_ = guardrail.Update(langfuse.SpanUpdate{
 		Output: map[string]interface{}{
 			"checks": map[string]interface{}{
 				"pii":       map[string]interface{}{"detected": false},
@@ -207,7 +207,7 @@ func main() {
 			"overall_safe": true,
 		},
 	})
-	guardrail.End()
+	_ = guardrail.End()
 	fmt.Println("Guardrail completed")
 
 	// Example 8: Embedding - LLM embedding calls
@@ -222,7 +222,7 @@ func main() {
 
 	// Simulate embedding call
 	time.Sleep(15 * time.Millisecond)
-	embedding.Update(langfuse.GenerationUpdate{
+	_ = embedding.Update(langfuse.GenerationUpdate{
 		Output: map[string]interface{}{
 			"dimensions": 1536,
 			"model":      "text-embedding-3-small",
@@ -233,17 +233,17 @@ func main() {
 			Unit:  "TOKENS",
 		},
 	})
-	embedding.End()
+	_ = embedding.End()
 	fmt.Println("Embedding completed")
 
 	// Complete the agent
-	agent.Update(langfuse.SpanUpdate{
+	_ = agent.Update(langfuse.SpanUpdate{
 		Output: map[string]interface{}{
 			"recommendation": "Carbone",
 			"reason":         "Highest rated and closest",
 		},
 	})
-	agent.End()
+	_ = agent.End()
 	fmt.Println("\nAgent completed")
 
 	// Example 9: Using StartAsCurrent* methods for context management
@@ -256,7 +256,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer agent2.End()
+	defer func() { _ = agent2.End() }()
 
 	// Start tool as current within agent context
 	toolCtx, tool2, err := client.StartAsCurrentTool(agentCtx2, "search-api", map[string]interface{}{
@@ -265,7 +265,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer tool2.End()
+	defer func() { _ = tool2.End() }()
 
 	// Get current observation from context
 	if obs, ok := langfuse.GetCurrentObservation(toolCtx); ok {
@@ -293,4 +293,3 @@ func main() {
 
 	fmt.Println("\nSpecialized observation types example completed!")
 }
-

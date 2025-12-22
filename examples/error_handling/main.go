@@ -51,7 +51,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer span.End()
+	defer func() { _ = span.End() }()
 
 	// Simulate an operation that might fail
 	err = simulateRiskyOperation()
@@ -59,7 +59,7 @@ func main() {
 		// Update span with error information
 		errMsg := err.Error()
 		errorLevel := langfuse.LevelError
-		span.Update(langfuse.SpanUpdate{
+		_ = span.Update(langfuse.SpanUpdate{
 			StatusMessage: &errMsg,
 			Level:         &errorLevel,
 			Output: map[string]interface{}{
@@ -69,7 +69,7 @@ func main() {
 		})
 		fmt.Printf("Operation failed: %v\n", err)
 	} else {
-		span.Update(langfuse.SpanUpdate{
+		_ = span.Update(langfuse.SpanUpdate{
 			Output: map[string]interface{}{
 				"success": true,
 			},

@@ -39,10 +39,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer rootSpan.End()
+	defer func() { _ = rootSpan.End() }()
 
 	// Update root span with metadata
-	rootSpan.Update(langfuse.SpanUpdate{
+	_ = rootSpan.Update(langfuse.SpanUpdate{
 		Metadata: map[string]interface{}{
 			"environment": "production",
 			"version":     "1.0.0",
@@ -67,7 +67,7 @@ func main() {
 	time.Sleep(50 * time.Millisecond)
 
 	// Update generation with output and usage
-	generation.Update(langfuse.GenerationUpdate{
+	_ = generation.Update(langfuse.GenerationUpdate{
 		Model: stringPtr("gpt-4o"),
 		Output: map[string]interface{}{
 			"messages": []map[string]interface{}{
@@ -81,10 +81,10 @@ func main() {
 			Unit:   "TOKENS",
 		},
 	})
-	generation.End()
+	_ = generation.End()
 
 	// Update root span with final output
-	rootSpan.Update(langfuse.SpanUpdate{
+	_ = rootSpan.Update(langfuse.SpanUpdate{
 		Output: map[string]interface{}{
 			"final_joke": "Why did the span cross the road? To get to the other trace!",
 		},
@@ -125,7 +125,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer downstreamSpan.End()
+	defer func() { _ = downstreamSpan.End() }()
 
 	fmt.Printf("Downstream span trace ID: %s (should match: %s)\n", downstreamSpan.TraceID, existingTraceID)
 
@@ -137,7 +137,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer parentSpan.End()
+	defer func() { _ = parentSpan.End() }()
 
 	// Child span 1
 	child1, err := parentSpan.StartChildObservation(
@@ -149,7 +149,7 @@ func main() {
 		log.Fatal(err)
 	}
 	time.Sleep(10 * time.Millisecond)
-	child1.End()
+	_ = child1.End()
 
 	// Child span 2
 	child2, err := parentSpan.StartChildObservation(
@@ -161,7 +161,7 @@ func main() {
 		log.Fatal(err)
 	}
 	time.Sleep(10 * time.Millisecond)
-	child2.End()
+	_ = child2.End()
 
 	// Example 6: Using different observation types
 	fmt.Println("\n=== Example 6: Different Observation Types ===")
@@ -182,10 +182,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	span.Update(langfuse.SpanUpdate{
+	_ = span.Update(langfuse.SpanUpdate{
 		Output: map[string]interface{}{"rows": 42},
 	})
-	span.End()
+	_ = span.End()
 
 	// Create a generation
 	gen, err := client.StartObservation(ctx, langfuse.ObservationTypeGeneration, "llm-call", map[string]interface{}{
@@ -194,7 +194,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	gen.Update(langfuse.GenerationUpdate{
+	_ = gen.Update(langfuse.GenerationUpdate{
 		Model: stringPtr("gpt-4"),
 		Output: map[string]interface{}{
 			"response": "AI is artificial intelligence",
@@ -205,7 +205,7 @@ func main() {
 			Total:  15,
 		},
 	})
-	gen.End()
+	_ = gen.End()
 
 	// Create an event
 	event, err := client.StartObservation(ctx, langfuse.ObservationTypeEvent, "user-action", map[string]interface{}{
@@ -215,7 +215,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	event.End()
+	_ = event.End()
 
 	// Example 7: Updating trace with user and session info
 	fmt.Println("\n=== Example 7: Updating Trace ===")

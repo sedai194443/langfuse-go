@@ -62,19 +62,19 @@ func main() {
 		if err != nil {
 			return "", err
 		}
-		defer obs.End()
+		defer func() { _ = obs.End() }()
 
 		// Execute the actual function
 		result, err := processData(data)
 		if err != nil {
-			obs.Update(langfuse.SpanUpdate{
+			_ = obs.Update(langfuse.SpanUpdate{
 				StatusMessage: stringPtr(err.Error()),
 			})
 			return "", err
 		}
 
 		// Update with output
-		obs.Update(langfuse.SpanUpdate{
+		_ = obs.Update(langfuse.SpanUpdate{
 			Output: map[string]interface{}{
 				"result": result,
 			},
@@ -148,17 +148,17 @@ func observeSpan[T any](client *langfuse.Client, ctx context.Context, name strin
 		if err != nil {
 			return nil, err
 		}
-		defer obs.End()
+		defer func() { _ = obs.End() }()
 
 		result, err := fn(obs.Context(), input)
 		if err != nil {
-			obs.Update(langfuse.SpanUpdate{
+			_ = obs.Update(langfuse.SpanUpdate{
 				StatusMessage: stringPtr(err.Error()),
 			})
 			return nil, err
 		}
 
-		obs.Update(langfuse.SpanUpdate{
+		_ = obs.Update(langfuse.SpanUpdate{
 			Output: map[string]interface{}{
 				"result": result,
 			},
@@ -178,17 +178,17 @@ func observeSpanWithError[T any, R any](client *langfuse.Client, ctx context.Con
 		if err != nil {
 			return zero, err
 		}
-		defer obs.End()
+		defer func() { _ = obs.End() }()
 
 		result, err := fn(input)
 		if err != nil {
-			obs.Update(langfuse.SpanUpdate{
+			_ = obs.Update(langfuse.SpanUpdate{
 				StatusMessage: stringPtr(err.Error()),
 			})
 			return zero, err
 		}
 
-		obs.Update(langfuse.SpanUpdate{
+		_ = obs.Update(langfuse.SpanUpdate{
 			Output: map[string]interface{}{
 				"result": result,
 			},
@@ -207,17 +207,17 @@ func observeGeneration[T any](client *langfuse.Client, ctx context.Context, name
 		if err != nil {
 			return "", err
 		}
-		defer obs.End()
+		defer func() { _ = obs.End() }()
 
 		result, err := fn(obs.Context(), input)
 		if err != nil {
-			obs.Update(langfuse.GenerationUpdate{
+			_ = obs.Update(langfuse.GenerationUpdate{
 				StatusMessage: stringPtr(err.Error()),
 			})
 			return "", err
 		}
 
-		obs.Update(langfuse.GenerationUpdate{
+		_ = obs.Update(langfuse.GenerationUpdate{
 			Output: map[string]interface{}{
 				"response": result,
 			},

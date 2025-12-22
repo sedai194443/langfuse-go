@@ -49,7 +49,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer rootSpan.End()
+	defer func() { _ = rootSpan.End() }()
 
 	// Propagate context to downstream service
 	if err := simulateServiceCall(rootSpan.Context(), "user-service"); err != nil {
@@ -68,7 +68,7 @@ func main() {
 		log.Fatal(err)
 	}
 	time.Sleep(10 * time.Millisecond)
-	childSpan.End()
+	_ = childSpan.End()
 
 	fmt.Println()
 
@@ -97,7 +97,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer downstreamSpan.End()
+	defer func() { _ = downstreamSpan.End() }()
 
 	fmt.Printf("Downstream service trace ID: %s (matches upstream: %v)\n",
 		downstreamSpan.TraceID,
@@ -109,7 +109,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer span.End()
+	defer func() { _ = span.End() }()
 
 	// Get trace ID for correlation in application logs
 	if traceID, ok := langfuse.GetCurrentTraceID(span.Context()); ok {
