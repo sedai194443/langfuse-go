@@ -45,7 +45,8 @@ func main() {
 	ctx := context.Background()
 
 	fmt.Println("=== Logger Example ===")
-	fmt.Println("All API requests and responses will be logged\n")
+	fmt.Println("All API requests and responses will be logged")
+	fmt.Println()
 
 	// Create a trace - logger will capture the request
 	trace, err := client.CreateTrace(ctx, langfuse.Trace{
@@ -92,9 +93,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("Generation updated\n")
+	fmt.Println("Generation updated")
+	fmt.Println()
 
 	fmt.Println("Check the logs above to see all API requests and responses")
 	fmt.Println("This is useful for debugging and understanding SDK behavior")
 }
-

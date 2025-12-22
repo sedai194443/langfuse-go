@@ -37,7 +37,8 @@ func main() {
 
 	ctx := context.Background()
 
-	fmt.Println("=== Context Propagation Example ===\n")
+	fmt.Println("=== Context Propagation Example ===")
+	fmt.Println()
 
 	// Scenario 1: Starting a new trace and propagating it
 	fmt.Println("Scenario 1: New Trace Propagation")
@@ -135,4 +136,3 @@ func main() {
 
 	fmt.Println("\nAll context propagation examples completed!")
 }
-

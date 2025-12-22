@@ -308,4 +308,3 @@ func (c *Client) Flush() error {
 func (c *Client) Shutdown() error {
 	return c.Flush()
 }
-

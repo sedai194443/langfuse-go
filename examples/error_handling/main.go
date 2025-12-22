@@ -20,7 +20,8 @@ func main() {
 
 	ctx := context.Background()
 
-	fmt.Println("=== Error Handling Examples ===\n")
+	fmt.Println("=== Error Handling Examples ===")
+	fmt.Println()
 
 	// Example 1: Handling API errors
 	fmt.Println("Example 1: Handling API Errors")
@@ -73,7 +74,8 @@ func main() {
 				"success": true,
 			},
 		})
-		fmt.Println("Operation succeeded\n")
+		fmt.Println("Operation succeeded")
+		fmt.Println()
 	}
 
 	// Example 3: Error handling with context cancellation

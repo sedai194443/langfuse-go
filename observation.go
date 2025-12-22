@@ -33,10 +33,10 @@ type Observation struct {
 func (c *Client) StartObservation(ctx context.Context, obsType ObservationType, name string, input interface{}) (*Observation, error) {
 	// Get trace context from parent context if available
 	traceCtx, hasTraceCtx := GetTraceContext(ctx)
-	
+
 	var traceID string
 	var parentSpanID string
-	
+
 	if hasTraceCtx {
 		traceID = traceCtx.TraceID
 		parentSpanID = traceCtx.SpanID
@@ -44,20 +44,20 @@ func (c *Client) StartObservation(ctx context.Context, obsType ObservationType, 
 		// Create new trace if no context exists
 		traceID = CreateTraceID()
 	}
-	
+
 	observationID := CreateObservationID()
 	startTime := time.Now()
-	
+
 	var id string
-	
+
 	switch obsType {
 	case ObservationTypeSpan:
 		span := Span{
-			ID:                observationID,
-			TraceID:           traceID,
-			Name:              name,
-			StartTime:         &startTime,
-			Input:             input,
+			ID:                  observationID,
+			TraceID:             traceID,
+			Name:                name,
+			StartTime:           &startTime,
+			Input:               input,
 			ParentObservationID: parentSpanID,
 		}
 		resp, err := c.CreateSpan(ctx, span)
@@ -67,11 +67,11 @@ func (c *Client) StartObservation(ctx context.Context, obsType ObservationType, 
 		id = resp.ID
 	case ObservationTypeGeneration:
 		gen := Generation{
-			ID:                observationID,
-			TraceID:           traceID,
-			Name:              name,
-			StartTime:         &startTime,
-			Input:             input,
+			ID:                  observationID,
+			TraceID:             traceID,
+			Name:                name,
+			StartTime:           &startTime,
+			Input:               input,
 			ParentObservationID: parentSpanID,
 		}
 		resp, err := c.CreateGeneration(ctx, gen)
@@ -81,11 +81,11 @@ func (c *Client) StartObservation(ctx context.Context, obsType ObservationType, 
 		id = resp.ID
 	case ObservationTypeEvent:
 		event := Event{
-			ID:                observationID,
-			TraceID:           traceID,
-			Name:              name,
-			StartTime:         &startTime,
-			Input:             input,
+			ID:                  observationID,
+			TraceID:             traceID,
+			Name:                name,
+			StartTime:           &startTime,
+			Input:               input,
 			ParentObservationID: parentSpanID,
 		}
 		resp, err := c.CreateEvent(ctx, event)
@@ -96,7 +96,7 @@ func (c *Client) StartObservation(ctx context.Context, obsType ObservationType, 
 	default:
 		return nil, fmt.Errorf("unknown observation type: %s", obsType)
 	}
-	
+
 	// Create new trace context with this observation as active
 	newTraceCtx := TraceContext{
 		TraceID:      traceID,
@@ -104,7 +104,7 @@ func (c *Client) StartObservation(ctx context.Context, obsType ObservationType, 
 		ParentSpanID: parentSpanID,
 	}
 	newCtx := WithTraceContext(ctx, newTraceCtx)
-	
+
 	return &Observation{
 		client:       c,
 		ctx:          newCtx,
@@ -141,7 +141,7 @@ func (o *Observation) Update(update interface{}) error {
 // End ends the observation by updating it with end time
 func (o *Observation) End() error {
 	endTime := time.Now()
-	
+
 	switch o.Type {
 	case ObservationTypeSpan:
 		return o.Update(SpanUpdate{EndTime: &endTime})
@@ -164,4 +164,3 @@ func (o *Observation) Context() context.Context {
 func (o *Observation) StartChildObservation(obsType ObservationType, name string, input interface{}) (*Observation, error) {
 	return o.client.StartObservation(o.ctx, obsType, name, input)
 }
-

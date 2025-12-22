@@ -47,7 +47,8 @@ func main() {
 
 	ctx := context.Background()
 
-	fmt.Println("=== Observe Wrapper Examples ===\n")
+	fmt.Println("=== Observe Wrapper Examples ===")
+	fmt.Println()
 
 	// Note: The observe wrapper in Go is more limited than Python/JS decorators
 	// due to Go's type system. Here are practical alternatives:
@@ -95,7 +96,7 @@ func main() {
 		return fetchData(ctx, source)
 	}
 	observedFetchData := observeSpan(client, ctx, "fetch-data", wrappedFetchData)
-	
+
 	fetchResult, err := observedFetchData(ctx, "API")
 	if err != nil {
 		log.Fatal(err)
@@ -105,7 +106,7 @@ func main() {
 	// Example 3: Wrapping with error handling
 	fmt.Println("Example 3: Wrapping with Error Handling")
 	observedRiskyOp := observeSpanWithError(client, ctx, "risky-operation", riskyOperation)
-	
+
 	// Success case
 	successResult, err := observedRiskyOp(5)
 	if err != nil {
@@ -128,7 +129,7 @@ func main() {
 	}
 
 	observedLLMCall := observeGeneration(client, ctx, "llm-call", llmCall)
-	
+
 	response, err := observedLLMCall(ctx, "What is Go?")
 	if err != nil {
 		log.Fatal(err)
@@ -235,4 +236,3 @@ func observeGeneration[T any](client *langfuse.Client, ctx context.Context, name
 func stringPtr(s string) *string {
 	return &s
 }
-
