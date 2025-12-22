@@ -25,6 +25,9 @@ jobs:
   coverage:
     name: Coverage
     runs-on: ubuntu-latest
+    # Required for pushing badge to badges branch
+    permissions:
+      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -41,14 +44,9 @@ jobs:
         uses: vladopajic/go-test-coverage@v2
         with:
           config: ./.testcoverage.yml
-
-      # Generate coverage badge (only on main branch)
-      - name: Generate coverage badge
-        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-        uses: vladopajic/go-test-coverage@v2
-        with:
-          config: ./.testcoverage.yml
-          git-token: ${{ github.token }}
+          # Generate badge only on push to main/master (not on PRs)
+          # Token is empty string for PRs which disables badge generation
+          git-token: ${{ github.event_name == 'push' && secrets.GITHUB_TOKEN || '' }}
           git-branch: badges
 
   lint:
