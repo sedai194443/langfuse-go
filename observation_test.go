@@ -52,7 +52,7 @@ func createTestServer(t *testing.T) (*httptest.Server, *Client) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Decode request body to get ID
 		var body map[string]interface{}
-		json.NewDecoder(r.Body).Decode(&body)
+		_ = json.NewDecoder(r.Body).Decode(&body)
 
 		id := "generated-id"
 		if bodyID, ok := body["id"].(string); ok && bodyID != "" {
@@ -61,7 +61,7 @@ func createTestServer(t *testing.T) (*httptest.Server, *Client) {
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(map[string]string{"id": id})
+		_ = json.NewEncoder(w).Encode(map[string]string{"id": id})
 	}))
 
 	client, err := NewClient(Config{

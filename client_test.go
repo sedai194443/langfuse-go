@@ -100,7 +100,7 @@ func TestClient_CreateTrace(t *testing.T) {
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(TraceResponse{ID: "trace-123"})
+		_ = json.NewEncoder(w).Encode(TraceResponse{ID: "trace-123"})
 	}))
 	defer server.Close()
 

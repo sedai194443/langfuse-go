@@ -50,7 +50,7 @@ func TestNewBatchProcessor(t *testing.T) {
 func TestBatchProcessor_StartStop(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(BatchResponse{Successes: 1})
+		_ = json.NewEncoder(w).Encode(BatchResponse{Successes: 1})
 	}))
 	defer server.Close()
 
@@ -251,7 +251,7 @@ func TestBatchProcessor_RetryOnError(t *testing.T) {
 			return
 		}
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(BatchResponse{Successes: 1})
+		_ = json.NewEncoder(w).Encode(BatchResponse{Successes: 1})
 	}))
 	defer server.Close()
 

@@ -262,7 +262,7 @@ func (c *Client) StartAsCurrentSpan(ctx context.Context, name string, input inte
 
 	// Apply propagated attributes to the span
 	if hasAttrs {
-		obs.Update(SpanUpdate{
+		_ = obs.Update(SpanUpdate{
 			Metadata: attrs.Metadata,
 		})
 	}
@@ -281,7 +281,7 @@ func (c *Client) StartAsCurrentGeneration(ctx context.Context, name string, mode
 	}
 
 	// Update with model
-	obs.Update(GenerationUpdate{
+	_ = obs.Update(GenerationUpdate{
 		Model: &model,
 	})
 
@@ -318,7 +318,7 @@ func (c *Client) StartEmbedding(ctx context.Context, name string, model string, 
 		return nil, err
 	}
 	// Update with model
-	obs.Update(GenerationUpdate{
+	_ = obs.Update(GenerationUpdate{
 		Model: &model,
 	})
 	return obs, nil
