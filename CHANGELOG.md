@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.5] - 2025-12-22
+
+### Added
+- Added GitHub Actions CI/CD workflow for automated testing and coverage
+- Added [go-test-coverage](https://github.com/vladopajic/go-test-coverage) integration for coverage reporting
+- Added coverage badge to README
+- Added Makefile with helpful development commands:
+  - `make test` - run tests
+  - `make test-race` - run tests with race detector
+  - `make coverage` - generate HTML coverage report
+  - `make check-coverage` - verify coverage thresholds
+  - `make lint` - run golangci-lint
+
+### Changed
+- Enhanced test suite with comprehensive input/output data for all observation types
+- Updated README with development instructions and badges
+
 ## [0.1.4] - 2025-12-22
 
 ### Added

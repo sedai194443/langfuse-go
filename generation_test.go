@@ -76,24 +76,30 @@ func TestClient_CreateGeneration(t *testing.T) {
 
 func TestClient_UpdateGeneration(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPatch {
-			t.Errorf("expected PATCH, got %s", r.Method)
+		// UpdateGeneration uses POST with ID in body (upsert behavior)
+		if r.Method != http.MethodPost {
+			t.Errorf("expected POST, got %s", r.Method)
 		}
-		if r.URL.Path != "/api/public/generations/gen-123" {
-			t.Errorf("expected /api/public/generations/gen-123, got %s", r.URL.Path)
+		if r.URL.Path != "/api/public/generations" {
+			t.Errorf("expected /api/public/generations, got %s", r.URL.Path)
 		}
 
-		var update GenerationUpdate
-		if err := json.NewDecoder(r.Body).Decode(&update); err != nil {
+		var body map[string]interface{}
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 			t.Errorf("failed to decode request: %v", err)
 		}
 
-		if update.Output == nil {
+		// Check that ID is included in the body
+		if body["id"] != "gen-123" {
+			t.Errorf("expected id 'gen-123' in body, got %v", body["id"])
+		}
+
+		if body["output"] == nil {
 			t.Error("expected output to be set")
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
+		w.WriteHeader(http.StatusCreated)
 		json.NewEncoder(w).Encode(GenerationResponse{ID: "gen-123"})
 	}))
 	defer server.Close()

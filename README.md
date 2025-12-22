@@ -1,5 +1,10 @@
 # Langfuse Go SDK
 
+[![Go Test](https://github.com/AEKurt/langfuse-go/actions/workflows/test.yml/badge.svg)](https://github.com/AEKurt/langfuse-go/actions/workflows/test.yml)
+[![Coverage](https://raw.githubusercontent.com/AEKurt/langfuse-go/badges/.badges/main/coverage.svg)](https://github.com/AEKurt/langfuse-go/actions/workflows/test.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/AEKurt/langfuse-go)](https://goreportcard.com/report/github.com/AEKurt/langfuse-go)
+[![Go Reference](https://pkg.go.dev/badge/github.com/AEKurt/langfuse-go.svg)](https://pkg.go.dev/github.com/AEKurt/langfuse-go)
+
 Unofficial Go SDK for [Langfuse](https://langfuse.com) - an open-source LLM engineering platform.
 
 ## Installation
@@ -372,24 +377,64 @@ if obs, ok := langfuse.GetCurrentObservation(ctx); ok {
 client.UpdateCurrentSpan(ctx, output, metadata)
 ```
 
-## Testing
+## Development
+
+### Prerequisites
+
+- Go 1.21 or later
+- [golangci-lint](https://golangci-lint.run/) (optional, for linting)
+- [go-test-coverage](https://github.com/vladopajic/go-test-coverage) (optional, for coverage checks)
+
+### Testing
 
 Run the test suite:
 
 ```bash
 go test ./...
+# or using make
+make test
 ```
 
-Run tests with coverage:
+Run tests with race detector:
+
+```bash
+go test -v -race ./...
+# or using make
+make test-race
+```
+
+### Coverage
+
+Generate coverage report (opens HTML in browser):
+
+```bash
+make coverage
+```
+
+Check coverage against thresholds:
+
+```bash
+make check-coverage
+```
+
+View coverage in terminal:
 
 ```bash
 go test -cover ./...
 ```
 
-Run tests with verbose output:
+### Linting
+
+Run linter:
 
 ```bash
-go test -v ./...
+make lint
+```
+
+### Available Make Commands
+
+```bash
+make help  # Show all available commands
 ```
 
 ## License
@@ -399,4 +444,9 @@ MIT
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
+
+Before submitting:
+1. Run `make test` to ensure tests pass
+2. Run `make lint` to check for code issues
+3. Run `make check-coverage` to ensure coverage thresholds are met
 

@@ -12,9 +12,12 @@ import (
 // TestClient_CompleteWorkflow tests a complete workflow of creating a trace,
 // adding spans and generations, and scoring it
 func TestClient_CompleteWorkflow(t *testing.T) {
-	var traceID string
-	var spanID string
-	var genID string
+	traceID := "trace-123"
+	spanID := "span-123"
+	genID := "gen-123"
+
+	spanCallCount := 0
+	genCallCount := 0
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -23,27 +26,44 @@ func TestClient_CompleteWorkflow(t *testing.T) {
 		case "/api/public/traces":
 			var trace Trace
 			json.NewDecoder(r.Body).Decode(&trace)
-			traceID = "trace-123"
 			w.WriteHeader(http.StatusCreated)
 			json.NewEncoder(w).Encode(TraceResponse{ID: traceID})
 
 		case "/api/public/spans":
-			var span Span
-			json.NewDecoder(r.Body).Decode(&span)
-			if span.TraceID != traceID {
-				t.Errorf("span.TraceID = %v, want %v", span.TraceID, traceID)
+			var body map[string]interface{}
+			json.NewDecoder(r.Body).Decode(&body)
+
+			spanCallCount++
+			if spanCallCount == 1 {
+				// First call is CreateSpan
+				if body["traceId"] != traceID {
+					t.Errorf("span.TraceID = %v, want %v", body["traceId"], traceID)
+				}
+			} else {
+				// Second call is UpdateSpan (uses POST with ID in body)
+				if body["id"] != spanID {
+					t.Errorf("update span.ID = %v, want %v", body["id"], spanID)
+				}
 			}
-			spanID = "span-123"
 			w.WriteHeader(http.StatusCreated)
 			json.NewEncoder(w).Encode(SpanResponse{ID: spanID})
 
 		case "/api/public/generations":
-			var gen Generation
-			json.NewDecoder(r.Body).Decode(&gen)
-			if gen.TraceID != traceID {
-				t.Errorf("gen.TraceID = %v, want %v", gen.TraceID, traceID)
+			var body map[string]interface{}
+			json.NewDecoder(r.Body).Decode(&body)
+
+			genCallCount++
+			if genCallCount == 1 {
+				// First call is CreateGeneration
+				if body["traceId"] != traceID {
+					t.Errorf("gen.TraceID = %v, want %v", body["traceId"], traceID)
+				}
+			} else {
+				// Second call is UpdateGeneration (uses POST with ID in body)
+				if body["id"] != genID {
+					t.Errorf("update gen.ID = %v, want %v", body["id"], genID)
+				}
 			}
-			genID = "gen-123"
 			w.WriteHeader(http.StatusCreated)
 			json.NewEncoder(w).Encode(GenerationResponse{ID: genID})
 
@@ -55,14 +75,6 @@ func TestClient_CompleteWorkflow(t *testing.T) {
 			}
 			w.WriteHeader(http.StatusCreated)
 			json.NewEncoder(w).Encode(ScoreResponse{ID: "score-123"})
-
-		case "/api/public/spans/span-123":
-			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode(SpanResponse{ID: spanID})
-
-		case "/api/public/generations/gen-123":
-			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode(GenerationResponse{ID: genID})
 
 		default:
 			t.Errorf("unexpected path: %s", r.URL.Path)

@@ -1,0 +1,40 @@
+# go-test-coverage configuration
+# See: https://github.com/vladopajic/go-test-coverage
+
+# Path to coverage profile file (output of `go test -coverprofile` command)
+profile: cover.out
+
+# Coverage thresholds (values should be in range [0-100])
+threshold:
+  # Minimum coverage percentage required for individual files
+  # Set to 0 to allow files with low coverage while we improve tests
+  file: 0
+
+  # Minimum coverage percentage required for each package
+  package: 60
+
+  # Minimum overall project coverage percentage required
+  # Current coverage is ~65%, set threshold slightly below
+  total: 60
+
+# Override thresholds for specific paths
+override:
+  # Examples don't need test coverage
+  - path: ^examples/
+    threshold: 0
+  # observe.go is a decorator pattern, hard to unit test
+  - path: observe\.go$
+    threshold: 0
+  # trace_context.go needs integration tests
+  - path: trace_context\.go$
+    threshold: 20
+
+# Exclude files or packages from coverage statistics
+exclude:
+  paths:
+    # Exclude example files from coverage calculation
+    - ^examples/
+
+# Require comments explaining coverage-ignore annotations
+force-annotation-comment: false
+

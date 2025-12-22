@@ -64,24 +64,30 @@ func TestClient_CreateSpan(t *testing.T) {
 
 func TestClient_UpdateSpan(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPatch {
-			t.Errorf("expected PATCH, got %s", r.Method)
+		// UpdateSpan uses POST with ID in body (upsert behavior)
+		if r.Method != http.MethodPost {
+			t.Errorf("expected POST, got %s", r.Method)
 		}
-		if r.URL.Path != "/api/public/spans/span-123" {
-			t.Errorf("expected /api/public/spans/span-123, got %s", r.URL.Path)
+		if r.URL.Path != "/api/public/spans" {
+			t.Errorf("expected /api/public/spans, got %s", r.URL.Path)
 		}
 
-		var update SpanUpdate
-		if err := json.NewDecoder(r.Body).Decode(&update); err != nil {
+		var body map[string]interface{}
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 			t.Errorf("failed to decode request: %v", err)
 		}
 
-		if update.Output == nil {
+		// Check that ID is included in the body
+		if body["id"] != "span-123" {
+			t.Errorf("expected id 'span-123' in body, got %v", body["id"])
+		}
+
+		if body["output"] == nil {
 			t.Error("expected output to be set")
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
+		w.WriteHeader(http.StatusCreated)
 		json.NewEncoder(w).Encode(SpanResponse{ID: "span-123"})
 	}))
 	defer server.Close()
