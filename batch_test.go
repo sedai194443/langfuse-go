@@ -96,7 +96,7 @@ func TestBatchProcessor_Enqueue(t *testing.T) {
 		QueueSize: 10,
 	})
 	bp.Start()
-	defer bp.Stop()
+	defer func() { _ = bp.Stop() }()
 
 	// Enqueue various event types
 	tests := []struct {
@@ -133,10 +133,10 @@ func TestBatchProcessor_FlushOnBatchSize(t *testing.T) {
 		atomic.AddInt32(&requestCount, 1)
 
 		var req BatchRequest
-		json.NewDecoder(r.Body).Decode(&req)
+		_ = json.NewDecoder(r.Body).Decode(&req)
 
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(BatchResponse{Successes: len(req.Batch)})
+		_ = json.NewEncoder(w).Encode(BatchResponse{Successes: len(req.Batch)})
 	}))
 	defer server.Close()
 
@@ -154,13 +154,13 @@ func TestBatchProcessor_FlushOnBatchSize(t *testing.T) {
 
 	// Enqueue exactly MaxBatchSize events
 	for i := 0; i < 5; i++ {
-		bp.EnqueueTrace(Trace{Name: "test"})
+		_ = bp.EnqueueTrace(Trace{Name: "test"})
 	}
 
 	// Wait for batch to be sent
 	time.Sleep(100 * time.Millisecond)
 
-	bp.Stop()
+	_ = bp.Stop()
 
 	if atomic.LoadInt32(&requestCount) < 1 {
 		t.Error("Expected at least one batch request")
@@ -173,7 +173,7 @@ func TestBatchProcessor_FlushOnInterval(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		atomic.AddInt32(&requestCount, 1)
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(BatchResponse{Successes: 1})
+		_ = json.NewEncoder(w).Encode(BatchResponse{Successes: 1})
 	}))
 	defer server.Close()
 
@@ -190,12 +190,12 @@ func TestBatchProcessor_FlushOnInterval(t *testing.T) {
 	bp.Start()
 
 	// Enqueue one event
-	bp.EnqueueTrace(Trace{Name: "test"})
+	_ = bp.EnqueueTrace(Trace{Name: "test"})
 
 	// Wait for interval flush
 	time.Sleep(200 * time.Millisecond)
 
-	bp.Stop()
+	_ = bp.Stop()
 
 	if atomic.LoadInt32(&requestCount) < 1 {
 		t.Error("Expected at least one batch request from interval flush")
@@ -208,7 +208,7 @@ func TestBatchProcessor_ManualFlush(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		atomic.AddInt32(&requestCount, 1)
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(BatchResponse{Successes: 1})
+		_ = json.NewEncoder(w).Encode(BatchResponse{Successes: 1})
 	}))
 	defer server.Close()
 
@@ -223,11 +223,11 @@ func TestBatchProcessor_ManualFlush(t *testing.T) {
 		FlushInterval: 1 * time.Hour,
 	})
 	bp.Start()
-	defer bp.Stop()
+	defer func() { _ = bp.Stop() }()
 
 	// Enqueue events
-	bp.EnqueueTrace(Trace{Name: "test1"})
-	bp.EnqueueTrace(Trace{Name: "test2"})
+	_ = bp.EnqueueTrace(Trace{Name: "test1"})
+	_ = bp.EnqueueTrace(Trace{Name: "test2"})
 
 	// Manual flush
 	err := bp.Flush()
@@ -269,12 +269,12 @@ func TestBatchProcessor_RetryOnError(t *testing.T) {
 	})
 	bp.Start()
 
-	bp.EnqueueTrace(Trace{Name: "test"})
+	_ = bp.EnqueueTrace(Trace{Name: "test"})
 
 	// Wait for retries
 	time.Sleep(500 * time.Millisecond)
 
-	bp.Stop()
+	_ = bp.Stop()
 
 	if atomic.LoadInt32(&requestCount) < 3 {
 		t.Errorf("Expected at least 3 requests (with retries), got %d", requestCount)
@@ -309,11 +309,11 @@ func TestBatchProcessor_OnErrorCallback(t *testing.T) {
 	})
 	bp.Start()
 
-	bp.EnqueueTrace(Trace{Name: "test"})
+	_ = bp.EnqueueTrace(Trace{Name: "test"})
 
 	time.Sleep(200 * time.Millisecond)
 
-	bp.Stop()
+	_ = bp.Stop()
 
 	errorMu.Lock()
 	if !errorCalled {
@@ -335,8 +335,8 @@ func TestBatchProcessor_QueueFull(t *testing.T) {
 	bp.Start()
 
 	// Fill the queue
-	bp.EnqueueTrace(Trace{Name: "test1"})
-	bp.EnqueueTrace(Trace{Name: "test2"})
+	_ = bp.EnqueueTrace(Trace{Name: "test1"})
+	_ = bp.EnqueueTrace(Trace{Name: "test2"})
 
 	// This should fail
 	err := bp.EnqueueTrace(Trace{Name: "test3"})
@@ -344,7 +344,7 @@ func TestBatchProcessor_QueueFull(t *testing.T) {
 		t.Error("Expected error when queue is full")
 	}
 
-	bp.Stop()
+	_ = bp.Stop()
 }
 
 func TestAsyncClient(t *testing.T) {
@@ -353,7 +353,7 @@ func TestAsyncClient(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		atomic.AddInt32(&requestCount, 1)
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(BatchResponse{Successes: 1})
+		_ = json.NewEncoder(w).Encode(BatchResponse{Successes: 1})
 	}))
 	defer server.Close()
 
@@ -429,10 +429,8 @@ func TestAsyncClient(t *testing.T) {
 		t.Error("ScoreAsync() returned empty ID")
 	}
 
-	// Check queue length
-	if client.QueueLength() == 0 {
-		// May have already flushed
-	}
+	// Check queue length (may have already flushed)
+	_ = client.QueueLength()
 
 	// Flush
 	err = client.Flush()
@@ -459,10 +457,10 @@ func TestAsyncClient_ConcurrentWrites(t *testing.T) {
 		atomic.AddInt32(&requestCount, 1)
 
 		var req BatchRequest
-		json.NewDecoder(r.Body).Decode(&req)
+		_ = json.NewDecoder(r.Body).Decode(&req)
 
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(BatchResponse{Successes: len(req.Batch)})
+		_ = json.NewEncoder(w).Encode(BatchResponse{Successes: len(req.Batch)})
 	}))
 	defer server.Close()
 
@@ -488,14 +486,14 @@ func TestAsyncClient_ConcurrentWrites(t *testing.T) {
 		wg.Add(1)
 		go func(i int) {
 			defer wg.Done()
-			client.CreateTraceAsync(Trace{Name: "concurrent-trace"})
+			_, _ = client.CreateTraceAsync(Trace{Name: "concurrent-trace"})
 		}(i)
 	}
 	wg.Wait()
 
 	// Flush and shutdown
-	client.Flush()
-	client.Shutdown()
+	_ = client.Flush()
+	_ = client.Shutdown()
 
 	// Should have processed all events
 	if atomic.LoadInt32(&requestCount) == 0 {

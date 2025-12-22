@@ -130,7 +130,7 @@ func TestClient_CreateTrace(t *testing.T) {
 func TestClient_CreateTrace_Error(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"error": "invalid request"}`))
+		_, _ = w.Write([]byte(`{"error": "invalid request"}`))
 	}))
 	defer server.Close()
 

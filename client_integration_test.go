@@ -25,13 +25,13 @@ func TestClient_CompleteWorkflow(t *testing.T) {
 		switch r.URL.Path {
 		case "/api/public/traces":
 			var trace Trace
-			json.NewDecoder(r.Body).Decode(&trace)
+			_ = json.NewDecoder(r.Body).Decode(&trace)
 			w.WriteHeader(http.StatusCreated)
-			json.NewEncoder(w).Encode(TraceResponse{ID: traceID})
+			_ = json.NewEncoder(w).Encode(TraceResponse{ID: traceID})
 
 		case "/api/public/spans":
 			var body map[string]interface{}
-			json.NewDecoder(r.Body).Decode(&body)
+			_ = json.NewDecoder(r.Body).Decode(&body)
 
 			spanCallCount++
 			if spanCallCount == 1 {
@@ -46,11 +46,11 @@ func TestClient_CompleteWorkflow(t *testing.T) {
 				}
 			}
 			w.WriteHeader(http.StatusCreated)
-			json.NewEncoder(w).Encode(SpanResponse{ID: spanID})
+			_ = json.NewEncoder(w).Encode(SpanResponse{ID: spanID})
 
 		case "/api/public/generations":
 			var body map[string]interface{}
-			json.NewDecoder(r.Body).Decode(&body)
+			_ = json.NewDecoder(r.Body).Decode(&body)
 
 			genCallCount++
 			if genCallCount == 1 {
@@ -65,16 +65,16 @@ func TestClient_CompleteWorkflow(t *testing.T) {
 				}
 			}
 			w.WriteHeader(http.StatusCreated)
-			json.NewEncoder(w).Encode(GenerationResponse{ID: genID})
+			_ = json.NewEncoder(w).Encode(GenerationResponse{ID: genID})
 
 		case "/api/public/scores":
 			var score Score
-			json.NewDecoder(r.Body).Decode(&score)
+			_ = json.NewDecoder(r.Body).Decode(&score)
 			if score.TraceID != traceID {
 				t.Errorf("score.TraceID = %v, want %v", score.TraceID, traceID)
 			}
 			w.WriteHeader(http.StatusCreated)
-			json.NewEncoder(w).Encode(ScoreResponse{ID: "score-123"})
+			_ = json.NewEncoder(w).Encode(ScoreResponse{ID: "score-123"})
 
 		default:
 			t.Errorf("unexpected path: %s", r.URL.Path)

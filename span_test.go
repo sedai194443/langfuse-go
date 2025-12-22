@@ -119,7 +119,7 @@ func TestClient_UpdateSpan(t *testing.T) {
 func TestClient_CreateSpan_Error(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"error": "server error"}`))
+		_, _ = w.Write([]byte(`{"error": "server error"}`))
 	}))
 	defer server.Close()
 

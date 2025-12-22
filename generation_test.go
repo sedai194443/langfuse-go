@@ -133,7 +133,7 @@ func TestClient_UpdateGeneration(t *testing.T) {
 func TestClient_CreateGeneration_Error(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusUnauthorized)
-		w.Write([]byte(`{"error": "unauthorized"}`))
+		_, _ = w.Write([]byte(`{"error": "unauthorized"}`))
 	}))
 	defer server.Close()
 
