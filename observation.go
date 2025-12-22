@@ -2,6 +2,7 @@ package langfuse
 
 import (
 	"context"
+	"fmt"
 	"time"
 )
 
@@ -47,7 +48,6 @@ func (c *Client) StartObservation(ctx context.Context, obsType ObservationType, 
 	observationID := CreateObservationID()
 	startTime := time.Now()
 	
-	var err error
 	var id string
 	
 	switch obsType {

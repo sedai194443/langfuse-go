@@ -146,7 +146,6 @@ func (c *Client) doRequest(ctx context.Context, method, endpoint string, body in
 func (c *Client) handleResponse(resp *http.Response, v interface{}, allowCreated bool) error {
 	defer resp.Body.Close()
 
-	expectedStatus := http.StatusOK
 	if allowCreated {
 		if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
 			body, _ := io.ReadAll(resp.Body)

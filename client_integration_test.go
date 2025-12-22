@@ -80,9 +80,11 @@ func TestClient_CompleteWorkflow(t *testing.T) {
 		t.Fatalf("failed to create client: %v", err)
 	}
 
+	ctx := context.Background()
+
 	// Create trace
 	now := time.Now()
-	trace, err := client.CreateTrace(Trace{
+	trace, err := client.CreateTrace(ctx, Trace{
 		Name:      "workflow-test",
 		UserID:    "user-123",
 		Timestamp: &now,
@@ -128,9 +130,9 @@ func TestClient_CompleteWorkflow(t *testing.T) {
 			"prompt": "Hello",
 		},
 		Usage: &Usage{
-			Input: 10,
+			Input:  10,
 			Output: 20,
-			Total: 30,
+			Total:  30,
 		},
 	})
 	if err != nil {
@@ -159,4 +161,3 @@ func TestClient_CompleteWorkflow(t *testing.T) {
 		t.Fatalf("Score() error = %v", err)
 	}
 }
-
