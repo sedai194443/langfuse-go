@@ -1,11 +1,19 @@
-# Langfuse Go SDK
+<p align="center">
+  <img src="assets/banner.png" alt="Langfuse Go SDK" width="600">
+</p>
 
-[![Go Test](https://github.com/AEKurt/langfuse-go/actions/workflows/test.yml/badge.svg)](https://github.com/AEKurt/langfuse-go/actions/workflows/test.yml)
-[![Coverage](https://raw.githubusercontent.com/AEKurt/langfuse-go/badges/.badges/main/coverage.svg)](https://github.com/AEKurt/langfuse-go/actions/workflows/test.yml)
-[![Go Report Card](https://goreportcard.com/badge/github.com/AEKurt/langfuse-go)](https://goreportcard.com/report/github.com/AEKurt/langfuse-go)
-[![Go Reference](https://pkg.go.dev/badge/github.com/AEKurt/langfuse-go.svg)](https://pkg.go.dev/github.com/AEKurt/langfuse-go)
+<h1 align="center">Langfuse Go SDK</h1>
 
-Unofficial Go SDK for [Langfuse](https://langfuse.com) - an open-source LLM engineering platform.
+<p align="center">
+  <a href="https://github.com/AEKurt/langfuse-go/actions/workflows/test.yml"><img src="https://github.com/AEKurt/langfuse-go/actions/workflows/test.yml/badge.svg" alt="Go Test"></a>
+  <a href="https://github.com/AEKurt/langfuse-go/actions/workflows/test.yml"><img src="https://raw.githubusercontent.com/AEKurt/langfuse-go/badges/.badges/main/coverage.svg" alt="Coverage"></a>
+  <a href="https://goreportcard.com/report/github.com/AEKurt/langfuse-go"><img src="https://goreportcard.com/badge/github.com/AEKurt/langfuse-go" alt="Go Report Card"></a>
+  <a href="https://pkg.go.dev/github.com/AEKurt/langfuse-go"><img src="https://pkg.go.dev/badge/github.com/AEKurt/langfuse-go.svg" alt="Go Reference"></a>
+</p>
+
+<p align="center">
+  <strong>Unofficial Go SDK for <a href="https://langfuse.com">Langfuse</a> - an open-source LLM engineering platform.</strong>
+</p>
 
 ## Installation
 
