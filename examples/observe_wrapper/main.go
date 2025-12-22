@@ -90,7 +90,11 @@ func main() {
 
 	// Example 2: Helper function for wrapping
 	fmt.Println("Example 2: Helper Function Wrapper")
-	observedFetchData := observeSpan(client, ctx, "fetch-data", fetchData)
+	// Wrap fetchData to match the expected signature
+	wrappedFetchData := func(ctx context.Context, source string) (interface{}, error) {
+		return fetchData(ctx, source)
+	}
+	observedFetchData := observeSpan(client, ctx, "fetch-data", wrappedFetchData)
 	
 	fetchResult, err := observedFetchData(ctx, "API")
 	if err != nil {

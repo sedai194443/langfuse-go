@@ -34,9 +34,10 @@ func main() {
 	// Step 3: Create a generation (LLM call) within the trace
 	startTime := time.Now()
 	generation, err := client.CreateGeneration(ctx, langfuse.Generation{
-		TraceID: trace.ID,
-		Name:    "chat-completion",
-		Model:   "gpt-4",
+		TraceID:   trace.ID,
+		Name:      "chat-completion",
+		Model:     "gpt-4",
+		StartTime: &startTime,
 		Input: map[string]interface{}{
 			"messages": []map[string]interface{}{
 				{"role": "user", "content": "Hello!"},
@@ -83,4 +84,3 @@ func main() {
 	fmt.Println("\n✅ Successfully sent data to Langfuse!")
 	fmt.Println("Check your Langfuse dashboard to see the trace.")
 }
-

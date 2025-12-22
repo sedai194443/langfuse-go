@@ -57,9 +57,10 @@ func main() {
 	if err != nil {
 		// Update span with error information
 		errMsg := err.Error()
+		errorLevel := langfuse.LevelError
 		span.Update(langfuse.SpanUpdate{
 			StatusMessage: &errMsg,
-			Level:         &langfuse.LevelError,
+			Level:         &errorLevel,
 			Output: map[string]interface{}{
 				"error":   err.Error(),
 				"success": false,
@@ -127,4 +128,3 @@ func simulateRiskyOperation() error {
 	}
 	return nil
 }
-
