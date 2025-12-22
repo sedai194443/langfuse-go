@@ -295,17 +295,44 @@ func (c *Client) Score(ctx context.Context, score Score) (*ScoreResponse, error)
 	return &scoreResp, nil
 }
 
-// UpdateTrace updates an existing trace
+// UpdateTrace updates an existing trace by posting with the same ID (upsert)
 func (c *Client) UpdateTrace(ctx context.Context, traceID string, trace TraceUpdate) (*TraceResponse, error) {
-	endpoint := fmt.Sprintf("/traces/%s", traceID)
-	resp, err := c.doRequest(ctx, "PATCH", endpoint, trace)
+	// Create a trace with the ID and update fields - Langfuse uses POST for upsert
+	updateTrace := struct {
+		ID        string                 `json:"id"`
+		Name      *string                `json:"name,omitempty"`
+		UserID    *string                `json:"userId,omitempty"`
+		SessionID *string                `json:"sessionId,omitempty"`
+		Metadata  map[string]interface{} `json:"metadata,omitempty"`
+		Tags      []string               `json:"tags,omitempty"`
+		Input     interface{}            `json:"input,omitempty"`
+		Output    interface{}            `json:"output,omitempty"`
+		Public    *bool                  `json:"public,omitempty"`
+	}{
+		ID:        traceID,
+		Name:      trace.Name,
+		UserID:    trace.UserID,
+		SessionID: trace.SessionID,
+		Metadata:  trace.Metadata,
+		Tags:      trace.Tags,
+		Input:     trace.Input,
+		Output:    trace.Output,
+		Public:    trace.Public,
+	}
+
+	resp, err := c.doRequest(ctx, "POST", "/traces", updateTrace)
 	if err != nil {
 		return nil, err
 	}
 
 	var traceResp TraceResponse
-	if err := c.handleResponse(resp, &traceResp, false); err != nil {
+	if err := c.handleResponse(resp, &traceResp, true); err != nil {
 		return nil, err
+	}
+
+	// Return the ID we used
+	if traceResp.ID == "" {
+		traceResp.ID = traceID
 	}
 
 	return &traceResp, nil

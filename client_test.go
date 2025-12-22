@@ -158,24 +158,30 @@ func TestClient_CreateTrace_Error(t *testing.T) {
 
 func TestClient_UpdateTrace(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPatch {
-			t.Errorf("expected PATCH, got %s", r.Method)
+		// UpdateTrace uses POST with ID in body (upsert behavior)
+		if r.Method != http.MethodPost {
+			t.Errorf("expected POST, got %s", r.Method)
 		}
-		if r.URL.Path != "/api/public/traces/trace-123" {
-			t.Errorf("expected /api/public/traces/trace-123, got %s", r.URL.Path)
+		if r.URL.Path != "/api/public/traces" {
+			t.Errorf("expected /api/public/traces, got %s", r.URL.Path)
 		}
 
-		var update TraceUpdate
-		if err := json.NewDecoder(r.Body).Decode(&update); err != nil {
+		var body map[string]interface{}
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 			t.Errorf("failed to decode request: %v", err)
 		}
 
-		if update.Name == nil || *update.Name != "updated-trace" {
-			t.Error("expected name 'updated-trace'")
+		// Check that ID is included in the body
+		if body["id"] != "trace-123" {
+			t.Errorf("expected id 'trace-123' in body, got %v", body["id"])
+		}
+
+		if body["name"] != "updated-trace" {
+			t.Errorf("expected name 'updated-trace', got %v", body["name"])
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
+		w.WriteHeader(http.StatusCreated)
 		json.NewEncoder(w).Encode(TraceResponse{ID: "trace-123"})
 	}))
 	defer server.Close()
@@ -200,4 +206,3 @@ func TestClient_UpdateTrace(t *testing.T) {
 		t.Errorf("UpdateTrace() ID = %v, want trace-123", trace.ID)
 	}
 }
-
